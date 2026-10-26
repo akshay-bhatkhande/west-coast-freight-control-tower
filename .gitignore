@@ -1,0 +1,40 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Large FAF artifacts (never commit)
+data/raw/*.zip
+data/raw/*.csv
+data/raw/faf5_2018_2024/
+data/processed/*.parquet
+data/processed/*.duckdb
+data/processed/*.duckdb.wal
+data/processed/etl_stats.txt
+data/raw/SOURCE.txt
+!data/raw/SOURCE.example.txt
+
+# Keep directory placeholders
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/lookups/
+
+# Local notebooks / scratch
+*.ipynb_checkpoints/
+scratch/

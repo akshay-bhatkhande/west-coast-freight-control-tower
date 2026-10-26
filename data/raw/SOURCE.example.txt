@@ -1,0 +1,6 @@
+product=FAF5.7.1 Regional ODCM 2018-2024
+url=https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_2018-2024.zip
+retrieved=YYYY-MM-DD
+citation=U.S. Bureau of Transportation Statistics / FHWA Freight Analysis Framework 5 (FAF5.7.1). Public domain U.S. Government work.
+hub=https://www.bts.gov/faf
+doi=https://doi.org/10.21949/1529116

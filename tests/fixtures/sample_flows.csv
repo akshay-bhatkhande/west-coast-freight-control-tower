@@ -1,0 +1,13 @@
+dms_orig,dms_dest,dms_mode,sctg2,trade_type,dist_band,year,tons,value_2017usd,value_current,tmiles,orig_label,dest_label,mode_label,commodity_label,trade_label
+64,531,1,40,1,5,2024,100.0,50.0,55.0,20.0,San Francisco CA,Seattle WA,Truck,Miscellaneous manufactured products,Domestic
+64,531,2,40,1,5,2024,40.0,30.0,33.0,18.0,San Francisco CA,Seattle WA,Rail,Miscellaneous manufactured products,Domestic
+64,531,5,35,1,5,2024,10.0,80.0,90.0,5.0,San Francisco CA,Seattle WA,Multiple modes & mail,Electronic and electrical equipment,Domestic
+531,64,1,40,1,5,2024,80.0,40.0,44.0,16.0,Seattle WA,San Francisco CA,Truck,Miscellaneous manufactured products,Domestic
+531,64,2,40,1,5,2024,20.0,15.0,16.0,10.0,Seattle WA,San Francisco CA,Rail,Miscellaneous manufactured products,Domestic
+64,61,1,17,1,4,2024,200.0,120.0,130.0,30.0,San Francisco CA,Los Angeles CA,Truck,Gasoline and aviation turbine fuel,Domestic
+64,61,2,17,1,4,2024,50.0,20.0,22.0,12.0,San Francisco CA,Los Angeles CA,Rail,Gasoline and aviation turbine fuel,Domestic
+64,531,1,40,1,5,2023,90.0,45.0,48.0,18.0,San Francisco CA,Seattle WA,Truck,Miscellaneous manufactured products,Domestic
+64,531,2,40,1,5,2023,35.0,28.0,30.0,16.0,San Francisco CA,Seattle WA,Rail,Miscellaneous manufactured products,Domestic
+531,64,1,40,1,5,2023,70.0,35.0,38.0,14.0,Seattle WA,San Francisco CA,Truck,Miscellaneous manufactured products,Domestic
+61,64,1,17,1,4,2023,150.0,100.0,105.0,25.0,Los Angeles CA,San Francisco CA,Truck,Gasoline and aviation turbine fuel,Domestic
+64,64,1,40,1,1,2024,5.0,2.0,2.0,0.5,San Francisco CA,San Francisco CA,Truck,Miscellaneous manufactured products,Domestic
