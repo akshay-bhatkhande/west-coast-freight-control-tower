@@ -11,7 +11,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.brief import generate_ops_brief  # noqa: E402
 from src.kpis import (  # noqa: E402
+    _metric_col,
     commodity_mix,
     filter_flows,
     kpi_strip,
@@ -58,3 +60,31 @@ def test_import_smoke():
     import src.config  # noqa: F401
     import src.etl  # noqa: F401
     import src.kpis  # noqa: F401
+
+
+def test_metric_col_ui_labels():
+    assert _metric_col("tons") == "tons"
+    assert _metric_col("Tons") == "tons"
+    assert _metric_col("value_2017usd") == "value_2017usd"
+    assert _metric_col("Value (2017$)") == "value_2017usd"
+    assert _metric_col("value") == "value_2017usd"
+
+
+def test_ops_brief_respects_value_metric(sample: pd.DataFrame):
+    df = filter_flows(sample, year=2024, trade_type=1, exclude_intra=True)
+    brief = generate_ops_brief(
+        df,
+        sample,
+        year=2024,
+        trade_label="Domestic",
+        metric="value_2017usd",
+        metric_label="Value (2017$)",
+        geography_note="fixture",
+        scenario_pct=10,
+    )
+    assert "Value (2017$)" in brief
+    assert "of selected West Coast value" in brief
+    # UI label alone must also resolve (regression for P0)
+    k_ui = kpi_strip(df, metric="Value (2017$)")
+    k_col = kpi_strip(df, metric="value_2017usd")
+    assert k_ui["top_corridor"] == k_col["top_corridor"]
