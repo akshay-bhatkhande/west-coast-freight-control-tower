@@ -7,6 +7,7 @@ from datetime import date
 import pandas as pd
 
 from src.kpis import (
+    _metric_col,
     commodity_mix,
     kpi_strip,
     largest_yoy_swings,
@@ -44,9 +45,13 @@ def generate_ops_brief(
     geography_note: str,
     scenario_pct: float,
     both_directions: bool = True,
+    metric_label: str | None = None,
 ) -> str:
     """Build stakeholder weekly ops review markdown."""
-    kpis = kpi_strip(df_year, metric=metric, both_directions=both_directions)
+    focus_label = metric_label or metric
+    metric_col = _metric_col(metric)
+    kpis = kpi_strip(df_year, metric=metric_col, both_directions=both_directions)
+    share_noun = "tons" if metric_col == "tons" else "value"
     modes = mode_mix(df_year, metric="tons")
     commodities_tons = commodity_mix(df_year, metric="tons", n=5)
     commodities_val = commodity_mix(df_year, metric="value_2017usd", n=5)
@@ -109,13 +114,13 @@ def generate_ops_brief(
 **Period:** Calendar year {year} (FAF5.7.1 annual estimates; 2024 preliminary)  
 **Trade scope:** {trade_label}  
 **Geography:** {geography_note}  
-**Metric focus:** {metric}
+**Metric focus:** {focus_label}
 
 ---
 
 ## Headline
 
-Top corridor: **{kpis["top_corridor"]}** — {kpis["top_corridor_share"] * 100:.1f}% of selected West Coast tons.
+Top corridor: **{kpis["top_corridor"]}** — {kpis["top_corridor_share"] * 100:.1f}% of selected West Coast {share_noun}.
 
 - Total tons: **{_fmt_tons(kpis["total_tons"])}**
 - Total value: **{_fmt_value(kpis["total_value"])}**

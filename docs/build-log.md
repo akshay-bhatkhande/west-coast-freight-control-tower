@@ -14,3 +14,9 @@ AI-assisted iteration with human-owned KPI calls. Short dated bullets.
 - **Findings locked for README** from 2024 domestic WC inter-zone slice: metro↔rest-of-state concentration; ~64% truck / ~3% rail; tons vs value commodity reorder; Bay↔SeaTac ~88% truck.
 - **Tests:** 14 passed on fixtures; integration mark skips cleanly when parquet absent, runs when present.
 - **Cut enforced:** no maps, no FAF6, no forecasts, no ML, no paid APIs.
+
+## 2026-10-26 — Review Agent 3 polish
+
+- **P0 fix:** `_metric_col` now accepts Streamlit UI labels (`Tons`, `Value (2017$)`). Weekly Ops Brief was ranking corridors by tons even when Metric focus = Value (wrong headline corridor on All-WC). Brief now takes the processed metric column + display label.
+- **Usability:** Reset clears sidebar widget session keys (not just cache); KPI tons hint says “Thousand tons (FAF)” instead of ambiguous `k t`.
+- **Docs/media:** Added `LICENSE` (README claimed MIT with no file); recaptured `ops-brief.png` (was a duplicate of fullpage).

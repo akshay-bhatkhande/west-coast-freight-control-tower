@@ -51,10 +51,26 @@ def filter_flows(
 
 
 def _metric_col(metric: str) -> MetricCol:
+    """Normalize UI labels and aliases to a processed measure column."""
     if metric in ("tons", "value_2017usd", "value_current", "tmiles"):
         return metric
-    if metric.lower() in ("value", "value_2017", "value_2017usd"):
+    key = metric.strip().lower().replace(" ", "")
+    if key in ("tons", "ton", "thousandtons"):
+        return "tons"
+    if key in (
+        "value",
+        "value_2017",
+        "value_2017usd",
+        "value(2017$)",
+        "value(2017usd)",
+        "value2017$",
+        "value2017",
+    ):
         return "value_2017usd"
+    if key in ("tmiles", "ton-miles", "tonmiles"):
+        return "tmiles"
+    if key in ("value_current", "currentvalue", "value(current$)"):
+        return "value_current"
     return "tons"
 
 

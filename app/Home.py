@@ -175,7 +175,8 @@ python scripts/build_tables.py
 
 
 def fmt_tons(x: float) -> str:
-    return f"{x:,.0f}k t"
+    # Column already stores FAF thousand-tons units
+    return f"{x:,.0f}"
 
 
 def fmt_value(x: float) -> str:
@@ -212,9 +213,35 @@ available_years = sorted(int(y) for y in flows["year"].dropna().unique())
 default_year = DEFAULT_YEAR if DEFAULT_YEAR in available_years else available_years[-1]
 
 # --- Sidebar filters ---
+FILTER_KEYS = (
+    "flt_year",
+    "flt_trade",
+    "flt_metric",
+    "flt_preset",
+    "flt_direction",
+    "flt_exclude_intra",
+    "flt_origins",
+    "flt_dests",
+    "flt_scenario",
+)
+
+def _reset_filters() -> None:
+    for key in FILTER_KEYS:
+        st.session_state.pop(key, None)
+    st.cache_data.clear()
+
 with st.sidebar:
     st.markdown("### Filters")
-    year = st.selectbox("Year", available_years, index=available_years.index(default_year))
+    if st.button("Reset to defaults", help="Restore hero corridor + domestic defaults"):
+        _reset_filters()
+        st.rerun()
+
+    year = st.selectbox(
+        "Year",
+        available_years,
+        index=available_years.index(default_year),
+        key="flt_year",
+    )
     trade_options = {
         TRADE_TYPE_LABELS.get(int(t), str(t)): int(t)
         for t in sorted(flows["trade_type"].dropna().unique())
@@ -223,13 +250,14 @@ with st.sidebar:
     trade_keys = list(trade_options.keys())
     if "Domestic" in trade_keys:
         trade_keys = ["Domestic"] + [k for k in trade_keys if k != "Domestic"]
-    trade_label = st.selectbox("Trade type", trade_keys, index=0)
+    trade_label = st.selectbox("Trade type", trade_keys, index=0, key="flt_trade")
     trade_type = trade_options[trade_label]
 
     metric_choice = st.radio(
         "Metric focus",
         ["Tons", "Value (2017$)"],
         horizontal=True,
+        key="flt_metric",
     )
     metric = "tons" if metric_choice == "Tons" else "value_2017usd"
     metric_label = (
@@ -243,14 +271,24 @@ with st.sidebar:
             "All West Coast corridors (Top-10)",
             "Custom OD",
         ],
+        key="flt_preset",
     )
-    direction = st.radio("Direction", ["Both", "A → B", "B → A"], horizontal=True)
+    direction = st.radio(
+        "Direction",
+        ["Both", "A → B", "B → A"],
+        horizontal=True,
+        key="flt_direction",
+    )
     both = direction == "Both"
-    exclude_intra = st.checkbox("Exclude intra-zone flows", value=True)
+    exclude_intra = st.checkbox(
+        "Exclude intra-zone flows", value=True, key="flt_exclude_intra"
+    )
 
     zone_ids = sorted(WEST_COAST_ZONES.keys())
     zone_labels = [f"{WEST_COAST_ZONES[z]} ({z})" for z in zone_ids]
     label_to_id = {f"{WEST_COAST_ZONES[z]} ({z})": z for z in zone_ids}
+    hero_o_lab = f"{WEST_COAST_ZONES[HERO_ORIG]} ({HERO_ORIG})"
+    hero_d_lab = f"{WEST_COAST_ZONES[HERO_DEST]} ({HERO_DEST})"
 
     custom_origins: list[int] | None = None
     custom_dests: list[int] | None = None
@@ -271,12 +309,14 @@ with st.sidebar:
         o_labs = st.multiselect(
             "Origins",
             zone_labels,
-            default=[f"{WEST_COAST_ZONES[HERO_ORIG]} ({HERO_ORIG})"],
+            default=[hero_o_lab],
+            key="flt_origins",
         )
         d_labs = st.multiselect(
             "Destinations",
             zone_labels,
-            default=[f"{WEST_COAST_ZONES[HERO_DEST]} ({HERO_DEST})"],
+            default=[hero_d_lab],
+            key="flt_dests",
         )
         custom_origins = [label_to_id[x] for x in o_labs]
         custom_dests = [label_to_id[x] for x in d_labs]
@@ -296,12 +336,9 @@ with st.sidebar:
         min_value=0,
         max_value=SCENARIO_MAX_PCT,
         value=DEFAULT_SCENARIO_PCT,
+        key="flt_scenario",
         help="Share of truck tons reassigned to rail on the current selection.",
     )
-
-    if st.button("Reset to defaults"):
-        st.cache_data.clear()
-        st.rerun()
 
 # Base year slice for WC (trade + intra filter); corridor applied after for "All"
 try:
@@ -341,12 +378,16 @@ if df_year.empty:
 
 # KPI strip
 kpis = kpi_strip(df_year, metric=metric, both_directions=True)
+top_share_hint = (
+    f"{kpis['top_corridor_share']*100:.1f}% of selected "
+    + ("tons" if metric == "tons" else "value")
+)
 st.markdown(
     f"""
 <div class="kpi-strip">
   <div class="kpi"><div class="label">Total tons ({year})</div>
     <div class="value">{fmt_tons(kpis['total_tons'])}</div>
-    <div class="hint">FAF thousand-tons units</div></div>
+    <div class="hint">Thousand tons (FAF)</div></div>
   <div class="kpi"><div class="label">Total value ({year})</div>
     <div class="value">{fmt_value(kpis['total_value'])}</div>
     <div class="hint">Million 2017 constant $</div></div>
@@ -355,7 +396,7 @@ st.markdown(
     <div class="hint">Mode dependence signal</div></div>
   <div class="kpi"><div class="label">Top corridor</div>
     <div class="value" style="font-size:1.05rem">{kpis['top_corridor']}</div>
-    <div class="hint">{kpis['top_corridor_share']*100:.1f}% of selected tons</div></div>
+    <div class="hint">{top_share_hint}</div></div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -507,7 +548,8 @@ try:
         brief_all,
         year=year,
         trade_label=trade_label,
-        metric=metric_choice,
+        metric=metric,  # processed column, not UI label
+        metric_label=metric_choice,
         geography_note=geography_note,
         scenario_pct=float(scenario_pct),
         both_directions=True,
